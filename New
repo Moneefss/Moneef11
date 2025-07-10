@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>نظام إدارة القضايا</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* ... جميع التنسيقات كما في النسخ السابقة ... */
+    :root { --dark-blue: #0c2d48; --medium-blue: #145da0; --light-blue: #2d8cba; --lightest-blue: #b1d4e0; --white: #fff; --gray: #f4f8fe; --border: #d8e4f7; --shadow: #3b8beb33;}
+    body {min-height: 100vh;background: linear-gradient(135deg, var(--dark-blue) 60%, var(--light-blue) 100%);font-family: 'Segoe UI', Tahoma, Arial, sans-serif;margin: 0;color: var(--dark-blue);}
+    #container {width: 100%;max-width: 480px;margin: 0 auto;min-height: 100vh;display: flex;flex-direction: column;justify-content: flex-start;padding-bottom: 24px;}
+    .card {background: rgba(255, 255, 255, 0.13);backdrop-filter: blur(6px);border-radius: 15px;box-shadow: 0 4px 32px var(--shadow), 0 0px 0px #0000;padding: 22px 4vw 16px 4vw;margin: 12px auto;width: 98vw;max-width: 425px;border: 1.2px solid var(--lightest-blue);transition: box-shadow .3s;}
+    .card h2 {margin-top: 0;background: linear-gradient(90deg, var(--medium-blue), var(--light-blue));color: var(--white);border-radius: 7px;padding: 8px 0 7px 0;margin-bottom: 14px;box-shadow: 0 2px 8px var(--shadow);font-size: 1.27em;text-align: center;letter-spacing: 1px;}
+    label {display: block;margin-top: 16px;color: var(--white);font-weight: bold;font-size: 1em;letter-spacing: 0.5px;text-shadow: 0 1px 2px #0008;}
+    input, select, textarea, button {width: 100%;padding: 10px;margin-top: 7px;border-radius: 8px;border: 1.2px solid var(--lightest-blue);font-size: 1em;outline: none;transition: border .2s, background .2s;box-sizing: border-box;background: var(--gray);color: var(--dark-blue);}
+    input:focus, select:focus, textarea:focus {border-color: var(--medium-blue);background: #e2edfd;color: var(--medium-blue);}
+    input[readonly], textarea[readonly] {background: #f6fafd !important;color: #757575;font-weight: 500;}
+    button {background: linear-gradient(90deg, var(--medium-blue), var(--light-blue) 80%);color: var(--white);font-weight: bold;border: none;margin-top: 16px;cursor: pointer;letter-spacing: 1px;transition: background .2s, box-shadow .2s;box-shadow: 0 2px 8px var(--shadow);font-size: 1em;}
+    button:hover { background: linear-gradient(90deg, var(--light-blue), var(--medium-blue)); }
+    .menu-btn {width: 100%;margin: 10px 0;padding: 14px;background: linear-gradient(90deg, var(--medium-blue), var(--light-blue));color: var(--white);border: none;border-radius: 10px;font-size: 1.05em;font-weight: bold;box-shadow: 0 2px 8px var(--shadow);cursor: pointer;transition: background 0.2s;border: 2px solid var(--lightest-blue);display: flex;align-items: center;justify-content: center;gap: 12px;}
+    .menu-btn i { font-size: 1em; }
+    .menu-btn:hover { background: linear-gradient(90deg, var(--light-blue), var(--medium-blue)); }
+    .menu-list { margin-top: 16px; }
+    .note {color: var(--medium-blue);font-size: 0.92em;margin: 11px 0 0 0;text-align: center;opacity: 0.87;}
+    .settings-list {margin: 0 0 14px 0;padding: 0;display: flex;flex-direction: column;gap: 10px;}
+    .settings-btn {background: linear-gradient(90deg, var(--dark-blue), var(--light-blue));color: var(--white);font-size: 0.98em;border: none;border-radius: 9px;padding: 10px 0;cursor: pointer;transition: background 0.2s;box-shadow: 0 2px 8px var(--shadow);display: flex;align-items: center;gap: 9px;justify-content: center;}
+    .settings-btn i { font-size: 1.05em; }
+    .settings-btn:hover { background: linear-gradient(90deg, var(--light-blue), var(--medium-blue)); }
+    @media (max-width:600px) {#container { max-width: 100vw; }.card { padding: 4px 2vw 4px 2vw; max-width: 100vw;}label, input, select, textarea, button { font-size: 1em; }.menu-btn, .settings-btn { font-size: .98em; padding: 10px 0;}}
+    .alert {background: #e8f0fa;color: var(--dark-blue);border: 1.7px solid var(--light-blue);padding: 9px 0;margin: 0 0 12px 0;border-radius: 8px;text-align: center;font-size: 0.98em;font-weight: 600;box-shadow: 0 2px 8px var(--shadow);}
+    .table-wrap {overflow-x: auto;margin-top: 12px;}
+    table {width: 100%;border-collapse: collapse;background: linear-gradient(120deg, #f9fbfe 60%, #e8f2fc 140%);border-radius: 8px;overflow: hidden;margin-bottom: 7px;}
+    th, td {border: 1.2px solid var(--light-blue);padding: 8px 2px;text-align: center;font-size: 0.97em;}
+    th {background: linear-gradient(90deg, var(--light-blue), #e5f1fd 75%);color: var(--dark-blue);font-weight: bold;}
+    tr.selected, tr:hover {background: #c2e0ff;}
+    input[type="checkbox"] {width: 17px;height: 17px;accent-color: var(--light-blue);margin-top: 0;}
+    ::-webkit-input-placeholder { color: #7ab7e6; }
+    ::-moz-placeholder { color: #7ab7e6; }
+    :-ms-input-placeholder { color: #7ab7e6; }
+    ::placeholder { color: #7ab7e6; }
+    a.future-link {color: var(--light-blue);text-decoration: underline;cursor: pointer;font-weight: bold;display: inline-block;margin: 10px 0 0 0;font-size: 1em;}
+    a.future-link:hover {color: var(--dark-blue);text-decoration: underline wavy;}
+    .settings-section { margin-top: 10px; }
+    .excel-btn {background: linear-gradient(90deg, #1d7fbb, #6be4ff);color: #fff;border-radius: 7px;margin-top: 5px;margin-bottom: 7px;font-size: 1em;font-weight: bold;transition: background 0.15s;border: none;box-shadow: 0 1px 6px #2d8cba44;}
+    .excel-btn i { margin-left: 7px; }
+    .excel-btn:hover { background: linear-gradient(90deg, #6be4ff, #1d7fbb);}
+    .sys-info-row {background: #1a3457;color: #fff;border-radius: 8px;margin-top: 7px;padding: 7px 8px 6px 8px;font-weight: bold;font-size: .95em;letter-spacing: .5px;text-align: left;direction: ltr;user-select: text;display: flex;align-items: center;flex-wrap: wrap;gap: 7px;justify-content: flex-start;}
+    .sys-info-row span {margin-left: 7px;}
+    #activityHistoryList {margin-top: 7px; background: #0c223b; border-radius: 8px; padding: 8px; color: #fff;font-size: 0.93em;max-height: 140px; overflow-y: auto;}
+    #activityHistoryList li { padding:3px 0 3px 0; border-bottom: 1px dashed #b1d4e0; font-family: Tahoma,Arial; }
+    #activityHistoryList li:last-child { border-bottom: none; }
+    .disabled {pointer-events: none;opacity: 0.7;filter: grayscale(1);}
+  </style>
+</head>
+<body>
+<div id="container">
+  <div id="alert" class="alert" style="display:none"></div>
+  <!-- تسجيل الدخول -->
+  <div id="login-view" class="card">
+    <h2>تسجيل الدخول</h2>
+    <form id="loginForm">
+      <label>اسم المستخدم</label>
+      <input type="text" id="login-username" required autocomplete="username">
+      <label>كلمة المرور</label>
+      <input type="password" id="login-password" required autocomplete="current-password">
+      <button type="submit">دخول</button>
+    </form>
+    <div class="note">إذا لم يكن هناك مستخدمين، يمكنك إنشاؤهم من الإعدادات بعد الدخول كـ admin/admin</div>
+  </div>
+  <!-- القائمة الرئيسية -->
+  <div id="main-view" class="card" style="display:none">
+    <h2>مكتب المحامي إبراهيم الجبهة</h2>
+    <div class="menu-list">
+      <button class="menu-btn" onclick="goto('add-case')" id="menu-add-case"><i class="fas fa-file-circle-plus"></i>إدخال تفاصيل ملف القضية</button>
+      <button class="menu-btn" onclick="goto('search-case')" id="menu-search-case"><i class="fas fa-search"></i>بحث عن القضية</button>
+      <button class="menu-btn" onclick="goto('future-sync')" id="menu-sync"><i class="fas fa-cloud"></i>المزامنة والإعدادات</button>
+      <button class="menu-btn" onclick="goto('settings')" id="menu-settings"><i class="fas fa-cog"></i>الإعدادات</button>
+      <button class="menu-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i>تسجيل الخروج</button>
+    </div>
+    <div class="note" id="user-welcome"></div>
+  </div>
+  <!-- إدخال تفاصيل قضية -->
+  <div id="add-case-view" class="card" style="display:none">
+    <h2>إدخال تفاصيل القضية</h2>
+    <form id="addCaseForm" autocomplete="off">
+      <div id="addCaseFields"></div>
+      <button type="submit">حفظ</button>
+      <button type="button" onclick="goto('main')">عودة</button>
+    </form>
+  </div>
+  <!-- بحث عن القضايا -->
+  <div id="search-case-view" class="card" style="display:none">
+    <h2>بحث عن القضايا</h2>
+    <form id="searchCaseForm">
+      <div id="searchCaseFields"></div>
+      <button type="submit">بحث</button>
+      <button type="button" onclick="goto('main')">عودة</button>
+    </form>
+    <div class="table-wrap">
+      <table id="searchResultsTable" style="display:none;">
+        <thead><tr id="searchResultsHeader"></tr></thead>
+        <tbody id="searchResultsBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<script>
+let users = JSON.parse(localStorage.getItem('users') || '[]');
+let fields = JSON.parse(localStorage.getItem('case_fields') || '[]');
+let cases = JSON.parse(localStorage.getItem('cases') || '[]');
+let loggedUser = null, loggedRole = null;
+let lastSearchResults = [];
+
+function goto(view){
+  document.querySelectorAll('.card').forEach(div=>div.style.display="none");
+  document.getElementById(view+'-view').style.display = "block";
+  if(view==="main") document.getElementById("user-welcome").innerText = loggedUser ? "مرحباً، " + loggedUser : "";
+  if(view==="add-case") renderAddCaseForm();
+  if(view==="search-case") renderSearchCaseForm();
+}
+
+function showAlert(txt, timeout=1800) {
+  let alertDiv = document.getElementById("alert");
+  alertDiv.innerText = txt;
+  alertDiv.style.display = "block";
+  if(timeout > 0) setTimeout(()=>{alertDiv.style.display="none"}, timeout);
+}
+
+document.getElementById("loginForm").onsubmit = function(e){
+  e.preventDefault();
+  let u = document.getElementById("login-username").value.trim();
+  let p = document.getElementById("login-password").value;
+  let found = users.find(user=>user.username===u && user.password===p);
+  let role = found ? found.role : ((users.length === 0 && u==="admin" && p==="admin") ? "admin" : null);
+  if(role){
+    loggedUser = u;
+    loggedRole = role;
+    showAlert("تم تسجيل الدخول بنجاح",1200);
+    goto('main');
+  } else {
+    showAlert("بيانات الدخول غير صحيحة!",2500);
+  }
+  this.reset();
+}
+function logout(){ loggedUser=null; loggedRole=null; goto('login'); }
+
+function renderAddCaseForm(){
+  let cont = document.getElementById("addCaseFields");
+  cont.innerHTML = "";
+  fields.forEach((f,i)=>{
+    let html = "";
+    html += `<label>${f.label}${f.required?' *':''}</label>`;
+    if(f.type === 'number'){
+      html += `<input type="text" inputmode="decimal" pattern="[0-9\\-\\,\\.\\/\\s]*" name="field_${i}" ${f.required?'required':''}>`;
+    } else if(f.type === 'text')
+      html += `<input type="text" name="field_${i}" ${f.required?'required':''}>`;
+    else if(f.type === 'textarea')
+      html += `<textarea name="field_${i}" ${f.required?'required':''}></textarea>`;
+    else if(f.type === 'tel')
+      html += `<input type="tel" name="field_${i}" ${f.required?'required':''}>`;
+    else if(f.type === 'date')
+      html += `<input type="date" name="field_${i}" ${f.required?'required':''}>`;
+    else if(f.type === 'file')
+      html += `<input type="file" name="field_${i}" ${f.required?'required':''}>`;
+    else if(f.type === 'readonly')
+      html += `<input type="text" name="field_${i}" readonly value="${loggedUser || ''}">`;
+    else if(f.type === 'select'){
+      html += `<select name="field_${i}" ${f.required?'required':''}>`;
+      let opts = (f.options||"").split("|");
+      opts.forEach(opt => html += `<option value="${opt.trim()}">${opt.trim()}</option>`);
+      html += `</select>`;
+    }
+    let div = document.createElement("div"); div.innerHTML = html; cont.appendChild(div);
+  });
+}
+
+document.getElementById("addCaseForm").onsubmit = function(e){
+  e.preventDefault();
+  let data = {};
+  fields.forEach((f,i)=>{
+    let val = this["field_"+i];
+    data[f.label] = val ? val.value : "";
+  });
+  // سجل اسم المستخدم وتاريخ التعديل مع كل قضية
+  data["_edited_by"] = loggedUser;
+  data["_edit_date"] = new Date().toLocaleString("ar-EG");
+  cases.push(data);
+  localStorage.setItem('cases', JSON.stringify(cases));
+  showAlert('تم حفظ بيانات القضية', 1800);
+  this.reset();
+};
+
+function renderSearchCaseForm(){
+  let cont = document.getElementById("searchCaseFields");
+  cont.innerHTML = "";
+  fields.forEach((f,i)=>{
+    let html = `<label>${f.label}</label>`;
+    html += `<input type="text" name="field_${i}">`;
+    let div = document.createElement("div"); div.innerHTML = html; cont.appendChild(div);
+  });
+  document.getElementById("searchResultsTable").style.display = "none";
+}
+document.getElementById("searchCaseForm").onsubmit = function(e){
+  e.preventDefault();
+  let q = {};
+  fields.forEach((f,i)=>{
+    let v = this["field_"+i];
+    if(v && v.value) q[f.label] = v.value.trim();
+  });
+  let results = cases.filter(row=>{
+    let ok = true;
+    for(let k in q){
+      if(!row[k] || !(""+row[k]).includes(q[k])) ok = false;
+    }
+    return ok;
+  });
+  lastSearchResults = results;
+  renderSearchResults(results);
+};
+function renderSearchResults(results){
+  let table = document.getElementById("searchResultsTable");
+  let thead = document.getElementById("searchResultsHeader");
+  let tbody = document.getElementById("searchResultsBody");
+  if(results.length == 0){
+    table.style.display = "none";
+    showAlert("لا توجد نتائج مطابقة",2200);
+    return;
+  }
+  table.style.display = "table";
+  thead.innerHTML = ""; tbody.innerHTML = "";
+  let headers = fields.slice(0,3).map(f=>`<th>${f.label}</th>`).join("") + `<th>إجراءات</th>`;
+  thead.innerHTML = headers;
+  results.forEach((row,idx)=>{
+    let tr = document.createElement("tr");
+    tr.innerHTML = `
+      ${fields.slice(0,3).map(f=>`<td>${row[f.label]||""}</td>`).join("")}
+      <td><button onclick="previewCase(${idx})">معاينة</button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+function previewCase(idx){
+  let c = lastSearchResults[idx];
+  let cont = document.createElement("div");
+  cont.style="background:var(--white);border:2px solid var(--light-blue);padding:18px 7px;max-width:340px;margin:60px auto;border-radius:15px;box-shadow:0 4px 24px var(--shadow);position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:1000;";
+  cont.innerHTML = `<h3 style="color:var(--dark-blue);border-bottom:1.5px solid var(--light-blue);padding-bottom:7px;margin-top:0;">معاينة القضية</h3>`;
+  fields.forEach(f => {
+    cont.innerHTML += `<div style="margin:7px 0;"><b style="color:var(--light-blue);">${f.label}:</b> <span style="color:var(--dark-blue);">${c[f.label]||""}</span></div>`;
+  });
+  // عرض اسم آخر من عدّل وتاريخ التعديل
+  cont.innerHTML += `<div style="margin:7px 0;"><b style="color:var(--light-blue);">آخر تعديل بواسطة:</b> <span style="color:var(--dark-blue);">${c["_edited_by"]||""}</span></div>`;
+  cont.innerHTML += `<div style="margin:7px 0;"><b style="color:var(--light-blue);">تاريخ آخر تعديل:</b> <span style="color:var(--dark-blue);">${c["_edit_date"]||""}</span></div>`;
+  cont.innerHTML += `<button onclick="this.parentNode.remove()" class="settings-btn" style="margin-top:7px;">إغلاق</button>`;
+  document.body.appendChild(cont);
+}
+// فتح الصفحة على تسجيل الدخول كبداية
+goto('login');
+</script>
+</body>
+</html>
