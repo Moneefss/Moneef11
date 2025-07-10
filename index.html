@@ -523,20 +523,21 @@ function showAlert(txt, timeout=1800) {
 }
 
 // تسجيل الدخول (يوزر افتراضي admin/admin)
-document.getElementById("loginForm").onsubmit = function(e){
-  e.preventDefault();
-  let u = document.getElementById("login-username").value.trim();
-  let p = document.getElementById("login-password").value;
-  let found = users.find(user=>user.username===u && user.password===p);
-  let role = found ? found.role : ((users.length === 0 && u==="admin" && p==="admin") ? "admin" : null);
-  if(role){
-    loggedUser = u;
-    loggedRole = role;
-    let now = new Date();
-    sysActivities.push({
-      username: u,
-      dt: now.toLocaleDateString("ar-EG") + " " + now.toLocaleTimeString("ar-EG").replace(/:\d\d /," "),
-      action: "لم يقم بتعديل"
+document.getElementById("addCaseForm").onsubmit = function(e){
+  e.preventDefault(); // منع إعادة تحميل الصفحة
+  let data = {};
+  fields.forEach((f,i)=>{
+    let val = this["field_"+i];
+    data[f.label] = val ? val.value : "";
+  });
+  // أضف اسم المستخدم وتاريخ التعديل
+  data["_edited_by"] = loggedUser;
+  data["_edit_date"] = new Date().toLocaleString("ar-EG");
+  cases.push(data);
+  localStorage.setItem('cases', JSON.stringify(cases));
+  showAlert('تم حفظ بيانات القضية', 1800);
+  this.reset();
+};
     });
     localStorage.setItem('sys_activities', JSON.stringify(sysActivities));
     showAlert("تم تسجيل الدخول بنجاح",1200);
